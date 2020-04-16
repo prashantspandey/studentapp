@@ -27,6 +27,8 @@ class _CallPageState extends State<CallPage> {
   bool muted = false;
   String APP_ID;
   String channelName;
+ //   List<String> messages = [];
+//    ScrollController _scrollController = ScrollController();
   _CallPageState(this.APP_ID,this.channelName);
 
   @override
@@ -36,9 +38,9 @@ class _CallPageState extends State<CallPage> {
     // destroy sdk
     AgoraRtcEngine.leaveChannel();
     AgoraRtcEngine.destroy();
+     leaveLiveVideo(widget.user.key,widget.videoId,DateTime.now());
     super.dispose();
   }
-
   @override
   void initState() {
     super.initState();

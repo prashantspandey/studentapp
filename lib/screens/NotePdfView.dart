@@ -24,26 +24,6 @@ class _NotePdfView extends State<NotePdfView> {
         title: Text('Note'),
         backgroundColor: Colors.black.withOpacity(0.95),
       ),
-      floatingActionButton: Row(
-        children: <Widget>[
-          currentPage > 0
-              ? FloatingActionButton.extended(
-                  onPressed: () {
-                    currentPage -= 1;
-                    pdfViewController.setPage(currentPage);
-                  },
-                  label: Text('Next'))
-              : Offstage(),
-          currentPage < totalPages
-              ? FloatingActionButton.extended(
-                  onPressed: () {
-                    currentPage += 1;
-                    pdfViewController.setPage(currentPage);
-                  },
-                  label: Text('Previous'))
-              : Offstage()
-        ],
-      ),
       body: Stack(
         children: <Widget>[
           PDFView(
@@ -58,11 +38,8 @@ class _NotePdfView extends State<NotePdfView> {
             onViewCreated: (PDFViewController vc) {
               pdfViewController = vc;
             },
-            onPageChanged: (int page, int total) {
-              setState(() {});
-            },
           ),
-          pdfReady ? Offstage() : CircularProgressIndicator()
+          pdfReady ? Offstage() : Center(child: CircularProgressIndicator())
         ],
       ),
     );

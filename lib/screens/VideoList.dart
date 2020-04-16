@@ -4,6 +4,8 @@ import 'package:student_app/screens/NativeLiveVideo.dart';
 import 'package:student_app/screens/NativeVideoWebView.dart';
 import 'package:student_app/screens/SingleVideoPlayer.dart';
 import 'package:flutter/material.dart';
+import 'package:student_app/screens/YoutubeVideo.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class VideoList extends StatefulWidget {
   StudentUser user = StudentUser();
@@ -85,15 +87,21 @@ class _VideoList extends State<VideoList> {
                                 .split('T')[0]
                                 .toString(),style: TextStyle(fontWeight: FontWeight.bold,color: Colors.orange),),
                             onTap: () {
-                              //  Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) => SingleVideoPlayer(videos[index]['title'],videos[index]['link'])));
-                              Navigator.push(
+                              videos[index]['link'].contains('yout')? 
+                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => NativeVideoWebView(
-                                          videos[index]['link'])));
+                                      builder: (context) => YoutubeVideo(user,YoutubePlayer.convertUrlToId(videos[index]['link'])))):
+                               Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SingleVideoPlayer(videos[index]['title'],videos[index]['link'])));
+// 
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => NativeVideoWebView(
+                              //             videos[index]['link'])));
                             },
                           ),
                         );

@@ -1,4 +1,6 @@
+//import 'package:device_id/device_id.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +9,7 @@ import 'package:student_app/requests/request.dart';
 import 'package:student_app/screens/AllNotesScreen.dart';
 import 'package:student_app/screens/AllTestList.dart';
 import 'package:student_app/screens/AnnouncementScreen.dart';
+import 'package:student_app/screens/BatchesScreen.dart';
 import 'package:student_app/screens/LiveVideoList.dart';
 import 'package:student_app/screens/Login.dart';
 import 'package:student_app/screens/NativeLiveVideo.dart';
@@ -39,6 +42,14 @@ class _HomeScreen extends State<HomeScreen> {
   Future<SharedPreferences> preferences = SharedPreferences.getInstance();
   bool cancel = false;
   bool toUpdate = false;
+  bool studentJoined = true;
+  FileInfo fileInfo;
+  String error;
+  int downloaded;
+  int numberNotes;
+  double progress;
+  bool allDownloaded = false;
+
   List<dynamic> options = [
     {'name': 'Subjects', 'screen': SubjectsScreen, 'image': 'assets/ebook.png'},
     {
@@ -78,6 +89,17 @@ class _HomeScreen extends State<HomeScreen> {
       'screen': AnnouncementScreen,
       'image': 'assets/messages.png'
     },
+    {
+      'name': 'बतचेस',
+      'screen': BatchesScreen,
+      'image': 'assets/courses.webp'
+    },
+
+    //  {
+    // 'name': 'Profile',
+    // 'screen': UploadProfile,
+    // 'image': 'assets/messages.png'
+    // },
   ];
   homeScreenBanners(key) async {
     var response = await getHomeScreenBanners(key);
@@ -91,6 +113,20 @@ class _HomeScreen extends State<HomeScreen> {
       throw "Could not open url";
     }
   }
+
+  // deviceIdCheck() async {
+    // String deviceId = await DeviceId.getID;
+    // var response = await studentDeviceIdCheck(user.key, deviceId);
+    // if (response['status'] == 'Success') {
+      // if (response['logout'] == false) {
+        // return;
+      // } else if (response['logout'] == true) {
+        // SharedPreferences prefs = await preferences;
+        // prefs.clear();
+        // Navigator.pop(context);
+      // }
+    // }
+  // }
 
   isUpdateApp(context) async {
     var currentVersion;
@@ -158,29 +194,89 @@ class _HomeScreen extends State<HomeScreen> {
     }
   }
 
+  checkBatchAssignedProgress() async {
+    var response = await checkJoinRequestProgress(user.key);
+    if (response['status'] == 'Success') {
+      setState(() {
+        studentJoined = response['joined'];
+      });
+    } else {
+      setState(() {
+        studentJoined = true;
+      });
+    }
+  }
+
+  notesDownloader() async{
+    setState(() {
+      downloaded = 0;
+      numberNotes = 0;
+      progress = 0;
+    });
+var response = await getAllNotes(widget.user.key);
+var notes = response['notes'];
+for (var note in notes){
+  _downloadFile(note['url']);
+}
+  }
+
+
+
+
+  _downloadFile(url) {
+    print('note url ${url.toString()}');
+    DefaultCacheManager().getFile(url).listen((f) {
+      setState(() {
+        fileInfo = f;
+        error = null;
+        downloaded += 1;
+        print('downloaded ${downloaded.toString()}');
+        progress = (downloaded / numberNotes) * 100;
+        print('progerss ${progress.toString()}');
+      });
+      if (downloaded == numberNotes) {
+        setState(() {
+          allDownloaded = true;
+        });
+        // Navigator.pushReplacement(
+        // context,
+        // MaterialPageRoute(
+        // builder: (context) =>
+        // MainTestScreen(widget.user, test)));
+
+      }
+    }).onError((e) {
+      setState(() {
+        fileInfo = null;
+        error = e.toString();
+      });
+    });
+  }
+
+
+
+
+
   @override
   void initState() {
     super.initState();
+   // deviceIdCheck();
+    checkBatchAssignedProgress();
+    notesDownloader();
     _messaging.getToken().then((token) async {
       var response = await studentUpdateFirebaseToken(user.key, token);
     });
     SchedulerBinding.instance.addPostFrameCallback((_) => isUpdateApp(context));
   }
 
-  showLoader(context) {
+showLoader(context) {
     return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) {
-          return AlertDialog(
-            content: Container(
-              height: 100,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
-        });
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
   }
 
   instituteInformation() async {
@@ -195,7 +291,7 @@ class _HomeScreen extends State<HomeScreen> {
         builder: (context) {
           return AlertDialog(
             content: Container(
-              height: 100,
+              height: 200,
               child: Column(
                 children: <Widget>[
                   Text('Are you sure you want to logout?',
@@ -240,40 +336,35 @@ class _HomeScreen extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1.0),
-                child: CircleAvatar(
-                    radius: 25,
-                    child: ClipOval(
-                      child: Image.asset('assets/logo.png'),
-                    )),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Text('Welcome to ' + user.institute,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: MediaQuery.of(context).size.height * 0.02,
-                        fontWeight: FontWeight.bold)),
-              ),
-              Spacer(),
-              GestureDetector(
-                onTap: () async {
-                  await showLogoutDialog(context);
-                  if (cancel == false) {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => Login()));
-                  }
-                },
-                child:
-                    Icon(Icons.settings_power, color: Colors.black, size: 30),
-              ),
-            ],
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            CircleAvatar(
+                radius: 25,
+                child: ClipOval(
+                  child: Image.asset('assets/logo.png'),
+                )),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Text('Welcome to ' + user.institute,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold)),
+            ),
+            Spacer(),
+            GestureDetector(
+              onTap: () async {
+                await showLogoutDialog(context);
+                if (cancel == false) {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => Login()));
+                }
+              },
+              child:
+                  Icon(Icons.settings_power, color: Colors.black, size: 30),
+            ),
+          ],
         ),
         backgroundColor: Colors.white,
       ),
@@ -380,6 +471,31 @@ class _HomeScreen extends State<HomeScreen> {
                   ],
                 ),
               ),
+              studentJoined
+                  ? Container(
+                      height: 0,
+                    )
+                  : Container(
+                      color: Colors.white,
+                      height: 50,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(Icons.warning),
+                          ),
+                          Center(
+                              child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "Your request to join batches is pending. Your request will soon be verified by your teacher",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          )),
+                        ],
+                      ),
+                    ),
               Expanded(
                   child: GridView.count(
                 crossAxisCount: 3,
@@ -437,7 +553,13 @@ class _HomeScreen extends State<HomeScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => AnnouncementScreen(user)));
+                                  builder: (context) =>
+                                      AnnouncementScreen(user)));
+                        } else if (e['screen'].toString() == 'BatchesScreen') {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BatchesScreen(user)));
                         }
                       },
                       child: Card(

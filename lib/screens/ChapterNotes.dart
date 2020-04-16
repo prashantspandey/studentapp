@@ -1,9 +1,11 @@
 import 'package:student_app/pojos/basic.dart';
 import 'package:student_app/requests/request.dart';
 import 'package:student_app/screens/MainTestScreen.dart';
+import 'package:student_app/screens/NotePdfView.dart';
 import 'package:flutter/material.dart';
 import 'package:student_app/screens/NativeVideoWebView.dart';
 import 'package:student_app/screens/NewWebView.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ChapterNotes extends StatefulWidget {
@@ -32,6 +34,29 @@ class _ChapterNotesState extends State<ChapterNotes> {
 
 
   }
+
+  
+  
+    getNoteFileUrl(String url) async {
+    try {
+  var file = await DefaultCacheManager().getSingleFile(url);
+  return file;
+    } catch (e) {
+      throw Exception("Error ${e.toString()}");
+    }
+  }
+
+  showLoaderDialog(context) {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +90,7 @@ class _ChapterNotesState extends State<ChapterNotes> {
                         ),
                       ),
                       subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.all(5.0),
@@ -79,7 +105,18 @@ class _ChapterNotesState extends State<ChapterNotes> {
                         setState(() {
                           finalURL = "https://docs.google.com/viewer?url="+notes[index]['url'].replaceAll('\"', '');
                         });
-                        _launchUrl();
+                          showLoaderDialog(context);
+                          getNoteFileUrl(notes[index]['url']
+                          .toString()
+                          .replaceAll("\"", ''))
+                          .then((f) {
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NotePdfView(f.path)));
+
+                          });
                       //   Navigator.push(
                       //       context,
                       //       MaterialPageRoute(

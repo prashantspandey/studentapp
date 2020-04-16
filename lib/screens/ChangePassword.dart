@@ -17,6 +17,17 @@ class _ChangePassword extends State<ChangePassword> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordConfirmController = TextEditingController();
   TextEditingController otpController = TextEditingController();
+
+
+  showLoaderDialog(context) {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +81,7 @@ class _ChangePassword extends State<ChangePassword> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () async {
+                    showLoaderDialog(context);
                     if (otpController.text == widget.otp.toString().replaceAll("\ ", "")) {
                       if (passwordController.text ==
                           passwordConfirmController.text) {
@@ -79,14 +91,17 @@ class _ChangePassword extends State<ChangePassword> {
                           Fluttertoast.showToast(
                               msg:
                                   'Password Changed successfully ! Login with new password.');
+                                  Navigator.pop(context);
                           Navigator.pushReplacement(context,
                               MaterialPageRoute(builder: (context) => Login()));
                         } else {
+                                  Navigator.pop(context);
                           Fluttertoast.showToast(
                               msg: 'Wrong OTP. Please enter again.');
                         }
                       }
                     } else {
+                                  Navigator.pop(context);
                       Fluttertoast.showToast(
                           msg: 'Wrong OTP. Please try again ${widget.otp}');
                     }

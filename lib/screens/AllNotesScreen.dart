@@ -4,6 +4,7 @@ import 'package:student_app/requests/request.dart';
 import 'package:student_app/screens/NativeVideoWebView.dart';
 import 'package:student_app/screens/NotePdfView.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,12 +22,19 @@ class _AllNotesScreen extends State<AllNotesScreen> {
   var finalURL;
   getNoteFileUrl(String url) async {
     try {
-      var data = await http.get(url);
-      var bytes = data.bodyBytes;
-      var dir = await getApplicationDocumentsDirectory();
-      File file = File("${dir.path}/noteonline.pdf");
-      File urlfile = await file.writeAsBytes(bytes);
-      return urlfile;
+  var file = await DefaultCacheManager().getSingleFile(url);
+  //var file = await DefaultCacheManager().downloadFile(url);
+  return file;
+      // print('finalURL ${url.toString()}');
+      // print('starting donwnload');
+//      var data = await http.get(url);
+ //     var bytes = data.bodyBytes;
+      // print(' donwnloaded');
+      // var dir = await getApplicationDocumentsDirectory();
+      // File file = File("${dir.path}/noteonline.pdf");
+      // File urlfile = await file.writeAsBytes(bytes);
+      // print('url file got');
+      // return urlfile;
     } catch (e) {
       throw Exception("Error ${e.toString()}");
     }
@@ -86,6 +94,7 @@ class _AllNotesScreen extends State<AllNotesScreen> {
                           ),
                         ),
                         subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Padding(
                               padding: const EdgeInsets.all(5.0),
@@ -104,12 +113,12 @@ class _AllNotesScreen extends State<AllNotesScreen> {
                           ],
                         ),
                         onTap: () {
-                          setState(() {
-                            finalURL = notes[index]['url']
-                                .toString()
-                                .replaceAll("\"", "");
-                          });
-                          _launchUrl();
+                          // setState(() {
+                            // finalURL = notes[index]['url']
+                                // .toString()
+                                // .replaceAll("\"", "");
+                          // });
+                          // _launchUrl();
                           // Navigator.push(
                           // context,
                           // MaterialPageRoute(
@@ -120,16 +129,17 @@ class _AllNotesScreen extends State<AllNotesScreen> {
                           // .replaceAll("\"", ""))));
 
                           // showLoaderDialog(context);
-                          // getNoteFileUrl(notes[index]['url']
-                          // .toString()
-                          // .replaceAll("\"", ''))
-                          // .then((f) {
-                          // Navigator.pop(context);
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => NotePdfView(f.path)));
-                          //});
+                          showLoaderDialog(context);
+                          getNoteFileUrl(notes[index]['url']
+                          .toString()
+                          .replaceAll("\"", ''))
+                          .then((f) {
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NotePdfView(f.path)));
+                          });
                         },
                       ),
                     ),

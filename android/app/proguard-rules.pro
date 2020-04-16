@@ -13,3 +13,4 @@
 -keepclasseswithmembers class * {
   public void onPayment*(...);
 }
+-keep class com.shockwave.**

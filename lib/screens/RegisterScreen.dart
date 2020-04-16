@@ -1,9 +1,11 @@
+import 'package:student_app/pojos/basic.dart';
 import 'package:student_app/requests/request.dart';
 import 'package:student_app/screens/Login.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import '../helpers/app_settings.dart';
 class SignupPage extends StatefulWidget {
   @override
   _SignupPageState createState() => _SignupPageState();
@@ -14,163 +16,166 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
-  String instituteCode = 'ou';
+  String instituteCode = INSTITUTE_CODE;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  showLoader(context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+            content: Container(
+              height: 100,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SingleChildScrollView(
-            child: Column(
-      children: <Widget>[
-        ClipPath(
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Image.asset("assets/logo.png",height: MediaQuery.of(context).size.height*0.2,),
-              ],
-            ),
-            height: MediaQuery.of(context).size.height * 0.4,
-            width: double.infinity,
-            color: Colors.orange,
-          ),
-          clipper: MyClipper(),
-        ),
-        Container(
-          margin: EdgeInsets.only(
-              left: MediaQuery.of(context).size.width * 0.04,
-              right: MediaQuery.of(context).size.width * 0.04,
-              top: MediaQuery.of(context).size.height * 0.06),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      return SafeArea(
+      child: Scaffold(
+        body: Container(
+          color: Colors.white,
+          child: ListView(
             children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                        labelText: "FullName",
-                        prefixIcon: Icon(Icons.person),
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50)))),
-              ),
-              Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.010)),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: TextField(
-                    controller: usernameController,
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.phone),
-                        labelText: "Phone Number",
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50)))),
-              ),
-              Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.010)),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        labelText: "Password",
-                        prefixIcon: Icon(Icons.vpn_key),
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50)))),
-              ),
-              Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.010)),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: TextField(
-                    controller: confirmPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        labelText: "Confirm Password",
-                        prefixIcon: Icon(Icons.vpn_key),
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50)))),
-              ),
-              Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.025)),
-              Container(
-                child: MaterialButton(
-                    height: MediaQuery.of(context).size.height * 0.06,
-                    minWidth: MediaQuery.of(context).size.width * 0.85,
-                    color: Colors.orange,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
-                    child: Text(
-                      "Register",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: MediaQuery.of(context).size.height * 0.022),
-                    ),
-                    onPressed: () async {
-                      String username = usernameController.text;
-                      String password = passwordController.text;
-                      String confirmPassword = confirmPasswordController.text;
-                      String name = nameController.text;
-                      if (password == confirmPassword) {
-                        var response = await studentRegister(
-                            name, username, password, instituteCode);
-                        if (response['status'] == 'Success') {
-                          Navigator.pushReplacement(context,
-                              MaterialPageRoute(builder: (context) => Login()));
-
-                          Fluttertoast.showToast(
-                              msg:
-                                  'Successfully Registered !! Now login using your phone and password.');
-                        } else {
-                          Fluttertoast.showToast(
-                              msg:
-                                  'Error in registration - ${response['message']}');
-                        }
-                      } else {
-                        Fluttertoast.showToast(
-                            msg: 'Your passwords don\'t match.');
-                      }
-
-                      //Studentpage(studentUser);
-                    }),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.04,
-              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text("Already a member ?"),
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.pop(
-                          context,
-                          MaterialPageRoute(builder: (context) => Login()),
-                        );
-                      },
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                            color: Colors.orangeAccent,
-                            fontSize:
-                                MediaQuery.of(context).size.height * 0.022),
-                      ))
+                  Image.asset("assets/logo.png",
+                      height: MediaQuery.of(context).size.height * 0.09),
                 ],
-              )
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+              Padding(
+                padding: const EdgeInsets.only(left: 45, right: 45,bottom: 20),
+                child: TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(hintText: "Full Name"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 45, right: 45,bottom: 20),
+                child: TextField(
+                  controller: usernameController,
+                    keyboardType: TextInputType.number,
+                  decoration: InputDecoration(hintText: "Phone Number"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 45, right: 45,bottom: 60),
+                child: TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(hintText: "Password"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(22),
+                child: MaterialButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    color: Colors.blue,
+                    height: 50,
+                    minWidth: MediaQuery.of(context).size.width * 0.8,
+                    child: Text(
+                      "Register",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    onPressed: () {
+                      String username = usernameController.text;
+                      String password = passwordController.text;
+                      String name = nameController.text;
+                      if (username == null ||
+                          name == null ||
+                          username == '' ||
+                          name == '') {
+                        Fluttertoast.showToast(
+                            msg: 'Please fill all the fields');
+                      } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return RequestBatch(
+                                    instituteCode, name, username, password);
+                              });
+                      }
+
+
+
+
+                    }),
+              ),
+              Container(
+                  // width: MediaQuery.of(context).size.width*0.8,
+                  // color: Colors.red,
+                  padding: EdgeInsets.all(10),
+                  child: Center(
+                    child: RichText(
+                      text: TextSpan(
+                          text:
+                              'By signing up , you confirm that you have\n read and agree to the ',
+                          style: TextStyle(color: Colors.black, fontSize: 12),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Terms and Conditions\n',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 14,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                            TextSpan(text: "                    "),
+                            TextSpan(
+                              text: 'and ',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 12),
+                            ),
+                            TextSpan(
+                              text: 'Privacy Policy',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 14,
+                                decoration: TextDecoration.underline,
+                              ),
+                            )
+                          ]),
+                    ),
+                  )),
+              Container(
+                  padding: EdgeInsets.all(10),
+                  child: Center(
+                    child: RichText(
+                      text: TextSpan(
+                          text: 'Already have an account?',
+                          style: TextStyle(color: Colors.black, fontSize: 18),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: ' Login',
+                                style: TextStyle(
+                                    color: Colors.blueAccent, fontSize: 18),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                           Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Login()));
+                                   
+                                  })
+                          ]),
+                    ),
+                  ))
             ],
           ),
-        )
-      ],
-    )));
+        ),
+      ),
+    );
   }
 }
 
@@ -192,5 +197,132 @@ class MyClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;
+  }
+}
+
+class RequestBatch extends StatefulWidget {
+  String instituteCode;
+  String name;
+  String username;
+  String password;
+  RequestBatch(this.instituteCode, this.name, this.username, this.password);
+  @override
+  State<StatefulWidget> createState() {
+    return _RequestBatch(instituteCode);
+  }
+}
+
+class _RequestBatch extends State<RequestBatch> {
+  String instituteCode;
+  _RequestBatch(this.instituteCode);
+  var batches = [];
+  getBatches() async {
+    var response = await batchesBeforeRegistration(instituteCode);
+    var bats = response['batches'];
+    for (var ba in bats) {
+      var baDict = {'id': ba['id'], 'name': ba['name'], 'value': false};
+      setState(() {
+        batches.add(baDict);
+      });
+    }
+
+    return response;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getBatches();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        height: 400,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                  child: Text('Select your course/batch',
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold))),
+            ),
+            batches == null || batches.length == 0
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: batches.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return CheckboxListTile(
+                          title: Text(batches[index]['name']),
+                          value: batches[index]['value'],
+                          onChanged: (bool value) {
+                            setState(() {
+                              batches[index]['value'] = value;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ButtonTheme(
+                height: 50,
+                minWidth: MediaQuery.of(context).size.width - 50,
+                child: RaisedButton(
+                  color: Colors.black,
+                  child: Text('OK', style: TextStyle(color: Colors.white)),
+                  onPressed: () async {
+                    var sendBatches = [];
+                    for (var ba in batches) {
+                      if (ba['value'] == true) {
+                        sendBatches.add(ba['id']);
+                      }
+                    }
+                    if (sendBatches.length != 0) {
+                      var response = await studentRegister(widget.name,
+                          widget.username, widget.password, instituteCode,sendBatches);
+                      if (response['status'] == 'Success') {
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => Login()));
+//
+                        Fluttertoast.showToast(
+                            msg:
+                                'Successfully Registered !! Now login using your phone and password.');
+                                Navigator.pop(context);
+                          Navigator.pushReplacement(context,
+                              MaterialPageRoute(builder: (context) => Login()));
+
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'Error in registration - "Phone number already registered. ${response['message']}');
+                                Navigator.pop(context);
+                      }
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'Please select atleast one batch/course.');
+                    }
+
+                    print('register');
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

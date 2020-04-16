@@ -3,6 +3,7 @@ import 'package:student_app/screens/HomeScreen.dart';
 import 'package:student_app/screens/Login.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:student_app/screens/RegisterScreen.dart';
 
 void main() => runApp(MyApp());
 
@@ -45,7 +46,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Maths Mitra',
+        title: 'Prestige Point',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -53,7 +54,7 @@ class _MyAppState extends State<MyApp> {
           if(snapshot.data !=null){
               bool loggedIn = snapshot.data[0];
               var user = snapshot.data[1];
-              return loggedIn?HomeScreen(user):Login();
+              return loggedIn?HomeScreen(user):SignupPage();
           }
           else{
             return Center(child: CircularProgressIndicator(),);

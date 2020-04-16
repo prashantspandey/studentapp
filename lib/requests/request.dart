@@ -19,7 +19,8 @@ Future studentLogin(username, password) async {
   var data = await http.post(url, body: body, headers: headers);
   print('student login data ${data.toString()}');
   if (data.statusCode == 200 || data.statusCode == 201) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     studentUser = StudentUser.fromJson(response);
     String key = studentUser.key;
     print(key);
@@ -29,12 +30,13 @@ Future studentLogin(username, password) async {
   }
 }
 
-Future studentRegister(name, username, password, instituteCode) async {
+Future studentRegister(name, username, password, instituteCode,batches) async {
   Map<String, String> body = {
     'name': name,
     'username': username,
     'password': password,
     'institute_code': instituteCode,
+    'batches':jsonEncode(batches)
   };
   var headers = {
     "Accept": "application/json",
@@ -44,7 +46,8 @@ Future studentRegister(name, username, password, instituteCode) async {
   var data = await http.post(url, body: body, headers: headers);
   print('student register data ${data.toString()}');
   if (data.statusCode == 200 || data.statusCode == 201) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     //studentUser = StudentUser.fromJson(response);
     //String key = studentUser.key;
     //print(key);
@@ -65,7 +68,8 @@ Future getHomeScreenBanners(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print(response);
     return response;
   } else {
@@ -83,7 +87,8 @@ Future getAllVideos(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print(response);
     return response;
   } else {
@@ -101,7 +106,8 @@ Future getAllSubjects(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print(response);
     return response;
   } else {
@@ -123,7 +129,8 @@ Future getSubjectChapters(key, subjectId) async {
   var data = await http.post(url, body: body, headers: headers);
   print('student login data ${data.toString()}');
   if (data.statusCode == 200 || data.statusCode == 201) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print(' chapters ${response.toString()}');
     return response;
   } else {
@@ -141,7 +148,8 @@ Future getAllTests(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print(response);
     return response;
   } else {
@@ -163,7 +171,8 @@ Future getIndividualTest(key, testId) async {
   var data = await http.post(url, body: body, headers: headers);
   print('student login data ${data.toString()}');
   if (data.statusCode == 200 || data.statusCode == 201) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print('test respones ${response.toString()}');
     test = Test.fromJson(response['test']);
     print(' teest ${test.toString()}');
@@ -190,7 +199,8 @@ submitTest(key, testId, answers, totalTime) async {
       await http.post(url, body: body, headers: headers, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print(responseCode);
     return responseCode;
   } else {
@@ -214,7 +224,8 @@ getTestPerformance(key, performanceId) async {
       await http.post(url, body: body, headers: headers, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('response code ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -232,7 +243,8 @@ Future getTakenTests(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print(response);
     return response;
   } else {
@@ -250,7 +262,8 @@ Future getNotBoughtPackages(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print('not bougth packages ${response.toString()}');
     return response;
   } else {
@@ -268,7 +281,8 @@ Future getBoughtPackages(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print('get bougth packages ${response.toString()}');
     return response;
   } else {
@@ -291,7 +305,8 @@ getIndividualPackageDetails(key, packageId) async {
       await http.post(url, body: body, headers: headers, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('individual package details ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -315,7 +330,8 @@ studentBuyPackage(key, packageId, amount) async {
       await http.post(url, body: body, headers: headers, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('student buy package  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -338,7 +354,8 @@ studenCheckTakenTest(key, testId) async {
       await http.post(url, body: body, headers: headers, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('student test taken  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -362,7 +379,8 @@ studentUpdateFirebaseToken(key, token) async {
       await http.post(url, body: body, headers: headers, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('student firebase token  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -379,7 +397,8 @@ changePasswordOTP(phone) async {
   var data = await http.post(url, body: body, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('change otp  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -397,7 +416,8 @@ changePassword(phone, password) async {
   var data = await http.post(url, body: body, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('change password  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -421,7 +441,8 @@ getChapterNotes(key, chapterId) async {
       await http.post(url, headers: headers, body: body, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('chapter notes  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -430,6 +451,7 @@ getChapterNotes(key, chapterId) async {
 }
 
 Future getAllNotes(key) async {
+  print(key);
   var headers = {
     'Authorization': 'token $key',
     'Accept': 'application/json',
@@ -440,7 +462,8 @@ Future getAllNotes(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print('get notes ${response.toString()}');
     return response;
   } else {
@@ -478,7 +501,8 @@ Future getAgoraLiveVideo(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print('agora live videos ${response.toString()}');
     return response;
   } else {
@@ -504,7 +528,8 @@ agoraSendMessage(key, message, videoId) async {
       await http.post(url, headers: headers, body: body, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('live video send message  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -528,7 +553,8 @@ Future getChapterVideos(key,chapterId) async {
       await http.post(url, headers: headers, body: body, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('chapterwise videos  ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -553,7 +579,8 @@ Future getChapterTests(key,chapterId) async {
       await http.post(url, headers: headers, body: body, encoding: encoding);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('chapterwise tests ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -575,7 +602,8 @@ Future getInstituteInformation(key) async {
       await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var responseCode = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var responseCode = json.decode(utfDecode);
     print('institute information ${responseCode.toString()}');
     return responseCode;
   } else {
@@ -597,7 +625,8 @@ Future checkUpdate(key, version) async {
   var data = await http.post(url, headers: headers, body: body);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print('app version ${response.toString()}');
     return response;
   } else {
@@ -615,8 +644,146 @@ Future allAnnouncements(key) async {
   var data = await http.get(url, headers: headers);
 
   if (data.statusCode == 200) {
-    var response = json.decode(data.body);
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
     print('student announcements ${response.toString()}');
+    return response;
+  } else {
+    print(data.statusCode.toString());
+    return data.body;
+  }
+}
+
+Future joinLiveVideo(key, videoId,joinTime) async {
+  var headers = {
+    'Authorization': 'token $key',
+    'Accept': 'application/json',
+    "Content-Type": 'application/x-www-form-urlencoded'
+  };
+  var body = {
+    'video_id': jsonEncode(videoId),
+    'join_time': joinTime.toString(),
+  };
+  String url = 'http://15.206.150.90/api/basicinformation/student_join_live_video/';
+  var data = await http.post(url, headers: headers, body: body);
+
+  if (data.statusCode == 200) {
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
+    print('join live video ${response.toString()}');
+    return response;
+  } else {
+    print(data.statusCode.toString());
+    return data.body;
+  }
+}
+
+Future leaveLiveVideo(key, videoId,leaveTime) async {
+  print('leave video ${videoId.toString()}');
+  var headers = {
+    'Authorization': 'token $key',
+    'Accept': 'application/json',
+    "Content-Type": 'application/x-www-form-urlencoded'
+  };
+  var body = {
+    'video_id': jsonEncode(videoId),
+    'leaveTime': leaveTime.toString(),
+  };
+  String url = 'http://15.206.150.90/api/basicinformation/student_leave_live_video/';
+  var data = await http.post(url, headers: headers, body: body);
+
+  if (data.statusCode == 200) {
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
+    print('student leave live video ${response.toString()}');
+    return response;
+  } else {
+    print(data.statusCode.toString());
+    return data.body;
+  }
+}
+
+Future studentDeviceIdCheck(key, deviceId) async {
+  var headers = {
+    'Authorization': 'token $key',
+    'Accept': 'application/json',
+    "Content-Type": 'application/x-www-form-urlencoded'
+  };
+  var body = {
+    'deviceId': jsonEncode(deviceId),
+  };
+  String url = 'http://15.206.150.90/api/basicinformation/student_check_deviceId/';
+  var data = await http.post(url, headers: headers, body: body);
+
+  if (data.statusCode == 200) {
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
+    print('student device Id check ${response.toString()}');
+    return response;
+  } else {
+    print(data.statusCode.toString());
+    return data.body;
+  }
+}
+
+Future studentBatches(key) async {
+  var headers = {
+    'Authorization': 'token $key',
+    'Accept': 'application/json',
+    "Content-Type": 'application/x-www-form-urlencoded'
+  };
+  String url = 'http://15.206.150.90/api/basicinformation/student_batches/';
+  var data = await http.get(url, headers: headers);
+
+  if (data.statusCode == 200) {
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
+    print('student batches ${response.toString()}');
+    return response;
+  } else {
+    print(data.statusCode.toString());
+    return data.body;
+  }
+}
+
+Future batchesBeforeRegistration(instituteCode) async {
+  print('institute code $instituteCode');
+  var headers = {
+    'Accept': 'application/json',
+    "Content-Type": 'application/x-www-form-urlencoded'
+  };
+  var body = {
+    'institute_code': instituteCode,
+  };
+
+  String url = 'http://15.206.150.90/api/basicinformation/student_get_batches/';
+  var data = await http.post(url, headers: headers,body: body);
+
+  if (data.statusCode == 200) {
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
+    print('student before batches ${response.toString()}');
+    return response;
+  } else {
+    print(data.statusCode.toString());
+    return data.body;
+  }
+}
+
+Future checkJoinRequestProgress(key) async {
+  var headers = {
+    'Authorization': 'token $key',
+    'Accept': 'application/json',
+    "Content-Type": 'application/x-www-form-urlencoded'
+  };
+
+  String url = 'http://15.206.150.90/api/basicinformation/student_check_join_request/';
+  var data = await http.get(url, headers: headers);
+
+  if (data.statusCode == 200) {
+    var utfDecode = utf8.decode(data.bodyBytes);
+    var response = json.decode(utfDecode);
+    print('student check join request ${response.toString()}');
     return response;
   } else {
     print(data.statusCode.toString());

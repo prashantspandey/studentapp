@@ -3,6 +3,7 @@ import 'package:student_app/requests/request.dart';
 import 'package:student_app/screens/ChangePasswordOTP.dart';
 import 'package:student_app/screens/HomeScreen.dart';
 import 'package:student_app/screens/RegisterScreen.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,95 +12,75 @@ class Login extends StatelessWidget {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   Future<SharedPreferences> preferences = SharedPreferences.getInstance();
+showLoaderDialog(context) {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: ListView(
-      children: <Widget>[
-        ClipPath(
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "Student App",
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-                // Image(
-                //     height: 100,
-                //     width: 100,
-                //     image: AssetImage("asstes/flutter.png")),
-                Padding(
-                  padding: const EdgeInsets.only(left: 250, top: 50),
-                  child: Text(
-                    "Login",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                )
-              ],
-            ),
-            height: 350,
-            width: double.infinity,
-            color: Colors.orange,
-          ),
-          clipper: MyClipper(),
-        ),
-        Container(
-          margin: EdgeInsets.only(left: 20, right: 20, top: 50),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      return SafeArea(
+      child: Scaffold(
+        body: Container(
+          color: Colors.white,
+          child: ListView(
             children: <Widget>[
-              Container(
-                width: 350,
+              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset("assets/logo.png",
+                      height: MediaQuery.of(context).size.height * 0.09),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+              Padding(
+                padding: const EdgeInsets.only(left: 45, right: 45,bottom: 20),
                 child: TextField(
-                    controller: usernameController,
+                  controller: usernameController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        hintText: "Phone Number",
-                        prefixIcon: Icon(Icons.person),
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50)))),
+                  decoration: InputDecoration(hintText: "Phone Number"),
+                ),
               ),
-              Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-              Container(
-                width: 350,
+              Padding(
+                padding: const EdgeInsets.only(left: 45, right: 45,bottom: 60),
                 child: TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.vpn_key),
-                        hintText: "Password",
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50)))),
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(hintText: "Password"),
+                ),
               ),
-              Container(
-                  // color: Colors.red,
-                  margin: EdgeInsets.only(left: 220),
-                  child: FlatButton(
-                      onPressed: null, child: Text("Forgot Pasword ?"))),
-              Padding(padding: EdgeInsets.symmetric(vertical: 20)),
-              Container(
+              SizedBox(height: 60),
+              Padding(
+                padding: const EdgeInsets.all(22),
                 child: MaterialButton(
-                    height: 50,
-                    minWidth: 350,
-                    color: Colors.orange,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
+                        borderRadius: BorderRadius.circular(30)),
+                    color: Colors.blue,
+                    height: 50,
+                    minWidth: MediaQuery.of(context).size.width * 0.8,
                     child: Text(
                       "Login",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
-                    onPressed: () async {
-                      print('in on pressed');
+                    onPressed: () async{
                       String username = usernameController.text;
                       String password = passwordController.text;
-                      StudentUser studentUser =
-                          await studentLogin(username.toString().replaceAll("\ ", ''),password.toString().replaceAll("\ ", ""));
-                      //user,studentsprint('teacher key ${teacheruser.key}');
-                      //print('teacher name ${teacheruser.name}');
-                      if (studentUser == null) {
+                      if (username == null ||
+                          username == '' ||
+                          password == null || password == '') {
+                        Fluttertoast.showToast(
+                            msg: 'Please fill all the fields');
+                      } else {
+                        showLoaderDialog(context);
+                          StudentUser studentUser = await studentLogin(username.toString().replaceAll("\ ", ''),password.toString().replaceAll("\ ", ""));
+                             if (studentUser == null) {
                         Fluttertoast.showToast(
                             msg: "invalid user name and password",
                             toastLength: Toast.LENGTH_LONG,
@@ -107,34 +88,51 @@ class Login extends StatelessWidget {
                             timeInSecForIos: 2,
                             textColor: Colors.red,
                             fontSize: 20.0);
-                      }
-                              else if (usernameController.text.isEmpty ||
-                                passwordController.text.isEmpty) {
-                              Fluttertoast.showToast(
-                                 msg: "all fields are required",
-                                toastLength: Toast.LENGTH_LONG,
-                               gravity: ToastGravity.CENTER,
-                              timeInSecForIos: 2,
-                             textColor: Colors.red,
-                            fontSize: 20.0);
+                            Navigator.pop(context);
                       }
                       else {
-                        print('login pressed');
                             SharedPreferences prefs = await preferences;
                           prefs.setString('userkey',studentUser.key);
                            prefs.setString('institute',studentUser.institute);
                            prefs.setString('username',studentUser.username);
                           prefs.setString('name',studentUser.name);
+                            Navigator.pop(context);
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => HomeScreen(studentUser)));
                       }
 
-                      // print(respone);
+                      }
+
+
+
+
                     }),
               ),
-              Padding(
+
+              Container(
+                  padding: EdgeInsets.all(10),
+                  child: Center(
+                    child: RichText(
+                      text: TextSpan(
+                          text: 'Don\'t have an account ?',
+                          style: TextStyle(color: Colors.black, fontSize: 18),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: ' Register',
+                                style: TextStyle(
+                                    color: Colors.blueAccent, fontSize: 18),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                           Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => SignupPage()));
+                                   
+                                  })
+                          ]),
+                    ),
+                  )),
+    Padding(
                 padding: EdgeInsets.only(top: 100),
               ),
               Padding(
@@ -157,34 +155,12 @@ class Login extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 30,),
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: <Widget>[
-                    Text('Are you member ? If not '),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SignupPage()));
-                      },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(color: Colors.orange),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-
             ],
           ),
-        )
-      ],
-    ));
+        ),
+      ),
+    );
+
   }
 }
 

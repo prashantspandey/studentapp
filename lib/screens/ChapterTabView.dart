@@ -109,7 +109,7 @@ class _ChapterTabViewState extends State<ChapterTabView>
         },
         body: TabBarView(
           controller: tabController,
-          children: <Widget>[ChapterVideos(user,chapterObject['id']), ChapterTests(user,chapterObject['id']), ChapterNotes(user,chapterObject['id'])],
+          children: <Widget>[ChapterVideos(user,chapterObject['id']), ChapterTest(user,chapterObject['id']), ChapterNotes(user,chapterObject['id'])],
         ),
       ),
     );
